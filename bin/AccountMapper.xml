@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 계정 관련 xml -->
+<mapper namespace="dao.AccountMapper">
+
+<!-- 로그인 -->
+<select id="login" parameterType="member" resultType="member">
+select
+	member_num
+	,member_id
+	,member_sort
+from
+	member
+where
+	member_id = #{member_id}
+and
+	member_password = #{member_password}
+and
+	member_withdrawal in(0, 2)
+</select>
+
+
+<!-- ID or PW가 테이블에 존재하는지 확인 -->
+<select id="checkDuplicateAccount" parameterType="hashmap" resultType="int">
+select
+	member_num
+from
+	member
+<where>
+	<if test="type == 1">
+		member_id = #{word}
+	</if>
+	<if test="type == 2">
+		member_password = #{word}
+	</if>
+and 
+	member_withdrawal in(0, 2)
+</where>
+</select>
+
+
+<!-- 회원가입 -->
+<insert id="signUp" parameterType="member">
+insert into
+    member(member_num, member_id, member_password, member_sort)
+values
+    (member_seq.nextval, #{member_id}, #{member_password}, #{member_sort})
+</insert>
+
+
+<!-- 지역 코드 출력 -->
+<select id="printArea" resultType="area">
+select
+	area_num
+	,area_name
+from
+	area
+</select>
+
+
+<!-- 업종 구분 출력 -->
+<select id="printStoreCode" resultType="storeCode">
+select
+	code_num
+	,code_name
+from
+	store_code
+</select>
+
+
+<!-- 기업 회원 정보 입력 -->
+<insert id="inputStore" parameterType="store">
+insert into 
+    store(store_num
+         ,member_num
+         ,area_num
+         ,code_num
+         ,store_name
+         ,store_phone
+         ,minorderprice
+         ,deliverytime
+         ,deliverytip
+	)
+values
+    (store_seq.nextval
+    ,#{member_num}
+    ,#{area_num}
+    ,#{code_num}
+    ,#{store_name}
+    ,#{store_phone}
+    ,#{minOrderPrice}
+    ,#{deliveryTime}
+    ,#{deliveryTip}
+	)
+</insert>
+
+
+<!-- 개인 회원 정보 입력 -->
+<insert id="inputCustomer" parameterType="customer">
+insert into
+	customer(customer_num
+			,member_num
+			,customer_name
+			,customer_phone
+			,area_num
+			,customer_address
+	)
+values
+	(customer_seq.nextval
+	,#{member_num}
+	,#{customer_name}
+	,#{customer_phone}
+	,#{area_num}
+	,#{customer_address}
+)
+</insert>
+
+
+<!-- 비밀번호 변경 -->
+<update id="updatePassword" parameterType="member">
+update
+	member
+set
+	member_password = #{member_password}
+where
+	member_num = #{member_num}
+</update>
+
+
+<!-- 회원탈퇴 -->
+<update id="memberWithdrawal" parameterType="int">
+update
+	member
+set
+	member_withdrawal = 1
+where
+	member_num = #{member_num}
+</update>
+</mapper>
