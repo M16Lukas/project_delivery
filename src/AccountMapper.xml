@@ -139,4 +139,6 @@ set
 where
 	member_num = #{member_num}
 </update>
+
+
 </mapper>

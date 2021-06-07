@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 고객회원 주문 기능관련 xml : 고객회원 매장 검색, 카테고리, 주문 기능 -->
+<mapper namespace="dao.OrderMenuMapper">
+
+<!-- 카테고리별 매장 출력 기능-->
+
+<!-- 검색된 매장 출력 기능 -->
+
+</mapper>

@@ -1,6 +1,7 @@
 package ui;
 
 
+import java.util.Locale.Category;
 import java.util.Scanner;
 
 import mgr.DeliveryManager;
@@ -20,6 +21,7 @@ public class DeliveryUI{
 	private DeliveryManager mgr = new DeliveryManager();
 	
 	private Member loginUser = null;	// 로그인한 계정 정보 저장용 객체
+	private  loginUserInfo = null;
 	
 	// field
 	private boolean isRun = true;
@@ -135,6 +137,7 @@ public class DeliveryUI{
 		case 1:	// 매장 검색
 			break;
 		case 2:	// 카테고리
+			storeCategoryPage();
 			break;
 		case 3:	// 주문내역
 			break;
@@ -146,6 +149,17 @@ public class DeliveryUI{
 		}
 	}
 	
+	
+	/*
+	 * 카테고리 페이지
+	 */
+	public void storeCategoryPage() {
+		// 업종 코드 출력
+		int codeNum = printStoreCode();
+		
+		
+		
+	}
 	
 	/*
 	 * 고객 정보 페이지
@@ -315,7 +329,8 @@ public class DeliveryUI{
 	 */
 	public Member inputIdPw(int sort) {
 		scanner.nextLine();
-		String signUpID = null;
+		String signUpID = null;	// 가입할 ID
+		String signUpPW = null;	// 가입할 PW
 		
 		// ID 중복 체크
 		boolean chk = true;
@@ -330,8 +345,20 @@ public class DeliveryUI{
 			}
 		}
 		
-		System.out.print("PW : ");
-		String signUpPW = scanner.nextLine();
+		// 비밀번호 일치 확인
+		chk = true;
+		while (chk) {
+			System.out.print("PW : ");
+			signUpPW = scanner.nextLine();
+			System.out.print("PW 재입력 : ");
+			String signUpPWChk = scanner.nextLine();
+			if (signUpPW.equals(signUpPWChk)) {
+				chk = false;
+			} else {
+				System.out.println("[SYSTEM] 비밀번호가 일치하지 않습니다");
+			}
+		}
+		
 		return new Member(signUpID, signUpPW, sort);	
 	}
 	
