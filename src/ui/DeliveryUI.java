@@ -51,7 +51,7 @@ public class DeliveryUI{
 	 ******************/
 	// 시작 페이지
 	public int BeginPage(){
-		System.out.println("===== [ 배달 프로그램 ] =====\n");
+		System.out.println("===== [ 배달 프로그램TEST ] =====\n");
 		System.out.println("1. 로그인\n");
 		System.out.println("2. 회원가입\n");
 		System.out.println("0. 종료\n");
