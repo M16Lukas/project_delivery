@@ -12,7 +12,7 @@ import vo.Member;
 import vo.Store;
 import vo.StoreCode;
 
-public class DeliveryDAO {
+public class AccountDAO {
 	private SqlSessionFactory factory = MybatisConfig.getSqlSessionFactory();
 	
 	/**
@@ -39,19 +39,19 @@ public class DeliveryDAO {
 
 	
 	// ID or PW가 테이블에 존재하는지 확인
-	public Integer checkDuplicateAccount(HashMap<String, Object> map) {
+	public Member checkDuplicateAccount(String member_id) {
 		SqlSession session = null;
-		Integer check = 0;
+		Member user = null;
 		try {
 			session = factory.openSession();
 			AccountMapper mapper = session.getMapper(AccountMapper.class);
-			check = mapper.checkDuplicateAccount(map);
+			user = mapper.checkDuplicateAccount(member_id);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (session != null) session.close();
-		}		
-		return check;
+		}
+		return user;
 	}
 	
 	// 업종 분류 테이블 출력
@@ -126,7 +126,9 @@ public class DeliveryDAO {
 		return cnt;
 	}
 	
-	
+	/*
+	 * 로그인 
+	 */
 	// 로그인
 	public Member login(Member member) {
 		SqlSession session = null;
@@ -143,12 +145,93 @@ public class DeliveryDAO {
 		
 		return user;
 	}
-
-//	// 비밀번호 변경
-//	public int updatePassword(Member member) {
-//			
-//	}
+	
+	// 로그인한 매장 회원 상세 정보 가져오기
+	public Store getStoreInfo(int member_num) {
+		SqlSession session = null;
+		Store user = null;
+		try {
+			session = factory.openSession();
+			AccountMapper mapper = session.getMapper(AccountMapper.class);
+			user = mapper.getStoreInfo(member_num);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(session != null) session.close();
+		}
 		
+		return user;
+	}
+		
+	// 로그인한 개인 회원 상세 정보 가져오기
+	public Customer getCustomerInfo(int member_num) {
+		SqlSession session = null;
+		Customer user = null;
+		try {
+			session = factory.openSession();
+			AccountMapper mapper = session.getMapper(AccountMapper.class);
+			user = mapper.getCustomerInfo(member_num);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(session != null) session.close();
+		}
+		
+		return user;
+	}
+
+	// 비밀번호 변경
+	public int updatePassword(Member member) {
+		SqlSession session = null;
+		int cnt = 0;
+		try {
+			session = factory.openSession();
+			AccountMapper mapper = session.getMapper(AccountMapper.class);
+			cnt = mapper.updatePassword(member);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(session != null) session.close();
+		}
+		return cnt;
+	}
+		
+	
+	// 개인 회원 정보 수정
+	public int updateCustomerInfo(Customer customer) {
+		SqlSession session = null;
+		int cnt = 0;
+		try {
+			session = factory.openSession();
+			AccountMapper mapper = session.getMapper(AccountMapper.class);
+			cnt = mapper.updateCustomerInfo(customer);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(session != null) session.close();
+		}
+		return cnt;
+	}
+		
+	// 매장 회원 정보 수정
+	public int updateStoreInfo(Store store) {
+		SqlSession session = null;
+		int cnt = 0;
+		try {
+			session = factory.openSession();
+			AccountMapper mapper = session.getMapper(AccountMapper.class);
+			cnt = mapper.updateStoreInfo(store);
+			session.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if(session != null) session.close();
+		}
+		return cnt;
+	}
+	
 	// 회원탈퇴
 	public int memberWithdrawal(int member_num) {
 		SqlSession session = null;

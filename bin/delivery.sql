@@ -21,7 +21,7 @@ COMMIT;
 */
 create table MEMBER (   -- 회원 테이블
     member_num          number(38)     primary key      --회원 번호
-    ,member_id          varchar2(20)   not null unique  -- 회원 id
+    ,member_id          varchar2(20)   not null         -- 회원 id
     ,member_password    varchar2(20)   not null         -- 회원 비밀번호
     ,member_sort        number(1)                       -- 가입유형 분류 (0: 관리자, 1 : 매장회원, 2: 개인회원)
     ,member_signup      date           default sysdate  -- 회원가입일
@@ -32,7 +32,7 @@ create SEQUENCE member_seq;
 
 create table AREA ( -- 지역 테이블
     area_num    number(11)      primary key -- 지역 번호
-    ,area_name  varchar2(20)    not null    -- 지역 이름
+    ,area_name  varchar2(60)    not null    -- 지역 이름
 );
 
 create sequence area_seq;
@@ -72,7 +72,7 @@ create sequence menu_seq;
 create table CUSTOMER ( -- 고객 테이블
     customer_num        number(38)      primary key                     -- 고객 번호
     ,member_num         number(38)      references member(member_num)   -- 회원 번호
-    ,customer_name      varchar2(20)    not null                        -- 고객 이름
+    ,customer_name      varchar2(100)   not null                        -- 고객 이름
     ,customer_phone     varchar2(15)    not null                        -- 고객 전화번호
     ,area_num           number(11)      references area(area_num)       -- 지역 번호
     ,customer_address   varchar2(100)   not null                        -- 고객주소
@@ -103,7 +103,7 @@ insert into area(area_num, area_name) values (AREA_SEQ.nextval, '강원도');
 insert into area(area_num, area_name) values (AREA_SEQ.nextval, '충청남도');
 insert into area(area_num, area_name) values (AREA_SEQ.nextval, '대전광역시');
 insert into area(area_num, area_name) values (AREA_SEQ.nextval, '충청북도');
-insert into area(area_num, area_name) values (AREA_SEQ.nextval, '세종특별자치시');
+insert into area(area_num, area_name) values (AREA_SEQ.nextval, '세종시');
 insert into area(area_num, area_name) values (AREA_SEQ.nextval, '부산광역시');
 insert into area(area_num, area_name) values (AREA_SEQ.nextval, '울산광역시');
 insert into area(area_num, area_name) values (AREA_SEQ.nextval, '대구광역시');
@@ -189,6 +189,11 @@ insert into
     member(member_num, member_id, member_password, member_sort, member_withdrawal)
 values
     (member_seq.nextval, 'scit9', 'scit9', 2, 1);
+    
+insert into 
+    member(member_num, member_id, member_password, member_sort)
+values
+    (member_seq.nextval, 'scit9', 'scit9', 1);
 
 /*
 * 매장 테이블 (store)
@@ -346,6 +351,10 @@ insert into
 values
     (CUSTOMER_SEQ.nextval, 10, '크리보', '010-8745-0012', 2, '경기도 수원시');
 
+/*
+* 주문 테이블(ordered_menu)
+*/
+
 insert into
     ordered_menu(ordered_num, customer_num, store_num, menu_num)
 values
@@ -354,6 +363,6 @@ values
 insert into
     ordered_menu(ordered_num, customer_num, store_num, menu_num)
 values
-    (ORDERED_MENU_SEQ.nextval, 2, 2, 17);
+    (ORDERED_MENU_SEQ.nextval, 2, 2, 16);
 
 commit;

@@ -15,15 +15,20 @@ public class Member {
 	/*
 	 * Constructor
 	 */
-	// 회원 가입
+	public Member() {
+	}
+	
+	// 회원가입
 	public Member(String member_id, String member_password, int member_sort) {
 		this.member_id = member_id;
 		this.member_password = member_password;
 		this.member_sort = member_sort;
 	}
-
-	public Member() {
-		
+	
+	// 로그인
+	public Member(String member_id, String member_password) {
+		this.member_id = member_id;
+		this.member_password = member_password;
 	}
 	
 	/*

@@ -76,8 +76,4 @@ values
 	(menu_seq.nextval, #{store_num}, #{menu_name}, #{menu_intro, jdbcType=VARCHAR}, #{menu_price})
 </insert>
 
-<!-- 메뉴 수정 기능 -->
-<update id="updateMenu" parameterType="menu">
-
-</update>
 </mapper>

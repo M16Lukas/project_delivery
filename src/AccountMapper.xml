@@ -22,23 +22,51 @@ and
 	member_withdrawal in(0, 2)
 </select>
 
+<!-- 로그인한 매장 회원 상세 정보 가져오기 -->
+<select id="getStoreInfo" resultType ="store" parameterType="int">
+select
+   store_num
+   ,area_num
+   ,code_num
+   ,store_name
+   ,store_phone
+   ,minOrderPrice
+   ,deliveryTime
+   ,deliveryTip
+from
+   store
+where
+   member_num = #{member_num}
 
-<!-- ID or PW가 테이블에 존재하는지 확인 -->
-<select id="checkDuplicateAccount" parameterType="hashmap" resultType="int">
+</select>
+
+<!-- 로그인한 개인 회원 상세 정보 가져오기 -->
+<select id="getCustomerInfo" resultType = "customer" parameterType="int">
+select
+   customer_num
+   ,customer_name
+   ,customer_phone
+   ,area_num
+   ,customer_address
+from
+   customer
+where
+   member_num = #{member_num}
+
+</select>
+
+
+<!-- ID가 테이블에 존재하는지(중복되는 값이 있는지) 확인 -->
+<select id="checkDuplicateAccount" parameterType="String" resultType="member">
 select
 	member_num
+    ,member_password
 from
-	member
-<where>
-	<if test="type == 1">
-		member_id = #{word}
-	</if>
-	<if test="type == 2">
-		member_password = #{word}
-	</if>
+    member
+where
+    member_id = #{member_id}
 and 
 	member_withdrawal in(0, 2)
-</where>
 </select>
 
 
@@ -141,4 +169,36 @@ where
 </update>
 
 
+<!-- 개인 회원 정보 수정 -->
+<update id="updateCustomerInfo" parameterType="customer">
+update 
+	customer
+<set>
+	customer_num = #{customer_num}
+	<if test="customer_name != null">,customer_name = #{customer_name}</if>
+	<if test="customer_phone != null">,customer_phone = #{customer_phone}</if>
+	<if test="area_num != 0">,area_num = #{area_num}</if>
+	<if test="customer_address != null">,customer_address = #{customer_address}</if>
+</set>
+where
+	customer_num = #{customer_num}
+</update>
+
+<!-- 매장 회원 정보 수정 -->
+<update id="updateStoreInfo" parameterType ="customer">
+update 
+	store
+<set>
+	store_num = #{store_num}
+	<if test="area_num != 0">,area_num = #{area_num}</if>
+	<if test="code_num != 0">,code_num = #{code_num}</if>
+	<if test="store_name != null">,store_name = #{store_name}</if>
+	<if test="store_phone != null">,store_phone = #{store_phone}</if>
+	<if test="minOrderPrice != 0">,minOrderPrice = #{minOrderPrice}</if>
+	<if test="deliveryTime != 0">,deliveryTime = #{deliveryTime}</if>
+	<if test="deliveryTip != 0">,deliveryTip = #{deliveryTip}</if>
+</set>
+where
+	store_num = #{store_num}
+</update>
 </mapper>

@@ -1,17 +1,16 @@
 package mgr;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import dao.DeliveryDAO;
+import dao.AccountDAO;
 import vo.Area;
 import vo.Customer;
 import vo.Member;
 import vo.Store;
 import vo.StoreCode;
 
-public class DeliveryManager {
-	DeliveryDAO dao = new DeliveryDAO();
+public class AccountManager {
+	AccountDAO dao = new AccountDAO();
 	
 	/**
 	 * 계정 관련 기능 Group
@@ -23,16 +22,9 @@ public class DeliveryManager {
 		return dao.signUp(member) > 0 ? true : false; 
 	}
 
-	
 	// ID or PW가 테이블에 존재하는지 확인
-	// type : 1 -> ID, 2 -> PW
-	// true : ID or PW 가 중복, false : 중복되지 않음
-	public Integer checkDuplicateAccount(int type, String word) {
-		HashMap<String, Object> map = new HashMap<>();
-		map.put("type", type);
-		map.put("word", word);
-		Integer num = dao.checkDuplicateAccount(map);
-		return num != null ? num : 0;
+	public Member checkDuplicateAccount(String member_id) {
+		return dao.checkDuplicateAccount(member_id);
 	}
 	
 	// 업종 분류 테이블 출력
@@ -55,15 +47,39 @@ public class DeliveryManager {
 		return dao.inputCustomer(customer) > 0 ? true : false; 
 	}
 		
+	/*
+	 * 로그인
+	 */
 	// 로그인
 	public Member login(Member member) {
 		return dao.login(member);
 	}
-//		
-//	// 비밀번호 변경
-//	public boolean updatePassword(Member member) {
-//			
-//	}
+	
+	// 로그인한 매장 회원 상세 정보 가져오기
+	public Store getStoreInfo(int member_num) {
+		return dao.getStoreInfo(member_num);
+	}
+		
+	// 로그인한 개인 회원 상세 정보 가져오기
+	public Customer getCustomerInfo(int member_num) {
+		return dao.getCustomerInfo(member_num);
+		
+	}
+		
+	// 비밀번호 변경
+	public boolean updatePassword(Member member) {
+		return dao.updatePassword(member) > 0 ? true : false;
+	}
+	
+	// 개인 회원 정보 수정
+	public boolean updateCustomerInfo(Customer customer) {
+		return dao.updateCustomerInfo(customer) > 0 ? true : false;
+	}
+		
+	// 매장 회원 정보 수정
+	public boolean updateStoreInfo(Store store) {
+		return dao.updateStoreInfo(store) > 0 ? true : false;
+	}
 		
 	// 회원탈퇴
 	public boolean memberWithdrawal(int member_num) {
