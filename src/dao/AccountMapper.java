@@ -1,7 +1,6 @@
 package dao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import vo.Area;
 import vo.Customer;

@@ -25,7 +25,25 @@ public class Menu {
 		this.menu_price = menu_price;
 	}
 	
+	// 메뉴 수정
+	public Menu(int menu_num, String menu_name, String menu_intro, int menu_price, int menu_soldout) {
+		this.menu_num = menu_num;
+		this.menu_name = menu_name;
+		this.menu_intro = menu_intro;
+		this.menu_price = menu_price;
+		this.menu_soldout = menu_soldout;
+	}
 	
+	// 선택한 매장에 있는 메뉴인지 확인
+	public Menu(int menu_num, int store_num) {
+		this.menu_num = menu_num;
+		this.store_num = store_num;
+	}
+	
+	@Override
+	public String toString() {
+		return "메뉴명 : " + menu_name + "\t가격 : " + menu_price + "\n메뉴 소개 : " + menu_intro;
+	}
 	
 	/*
 	 * Getter & Setter

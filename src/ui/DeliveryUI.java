@@ -2,6 +2,7 @@ package ui;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import mgr.AccountManager;
@@ -10,6 +11,7 @@ import vo.Area;
 import vo.Customer;
 import vo.Member;
 import vo.Menu;
+import vo.OrderedMenu;
 import vo.Store;
 import vo.StoreCode;
 
@@ -28,6 +30,8 @@ public class DeliveryUI{
 	private Member loginUser = null;		// 로그인한 계정 정보 저장용 객체 
 	private Customer custUserInfo = null; 	// 로그인한 매장 회원 상세 정보
 	private Store storeUserInfo = null; 	// 로그인한 개인 회원 상세 정보
+	
+	private ArrayList<HashMap<String, Integer>> shoppingBasketLists = new ArrayList<>();	// 장바구니용 ArrayList
 	
 	// field
 	private boolean isRun = true;
@@ -96,8 +100,6 @@ public class DeliveryUI{
 		case CUSTOMER:
 			inputCustomerInfo();
 			break;
-		default:
-			break;
 		}
 	}
 	
@@ -116,8 +118,6 @@ public class DeliveryUI{
 		case CUSTOMER:
 			customerMainPage();
 			break;
-		default:
-			break;
 		}
 	}
 	
@@ -133,6 +133,7 @@ public class DeliveryUI{
 			System.out.println("1. 주문 이력 확인");
 			System.out.println("2. 메뉴 관리");
 			System.out.println("3. my정보");
+			System.out.println("======================================");
 			System.out.print("> ");
 			int menu = scanner.nextInt();
 			switch (menu) {
@@ -142,7 +143,7 @@ public class DeliveryUI{
 				controlMenuPage();
 				break;
 			case 3:	// my정보
-				userInfoPage();
+				run = userInfoPage();
 				break;
 			default:
 				run = false;
@@ -164,6 +165,7 @@ public class DeliveryUI{
 			System.out.println("2. 카테고리(업종)");
 			System.out.println("3. 주문내역");
 			System.out.println("4. my정보");
+			System.out.println("======================================");
 			System.out.print("> ");
 			int menu = scanner.nextInt();
 			switch (menu) {
@@ -199,6 +201,7 @@ public class DeliveryUI{
 			System.out.println("2. 로그아웃");
 			System.out.println("3. 회원탈퇴");
 			System.out.println("0. 뒤로가기");
+			System.out.println("--------------------");
 			System.out.print("> ");
 			int menu = scanner.nextInt();
 			switch (menu) {
@@ -208,6 +211,7 @@ public class DeliveryUI{
 			case 2:	// 로그아웃
 				logOut();
 				run = false;
+				returnB = false;
 				break;
 			case 3:	// 회원탈퇴
 				withdrawalPage();
@@ -237,6 +241,7 @@ public class DeliveryUI{
 			System.out.println("1. 비밀번호 변경");
 			System.out.println("2. 상세정보 변경");
 			System.out.println("0. 뒤로가기");
+			System.out.println("------------------------");
 			System.out.print("> ");
 			int menu = scanner.nextInt();
 			switch (menu) {
@@ -265,7 +270,7 @@ public class DeliveryUI{
 	
 	
 	/*
-	 * 개인 회원 정보 수정 페이지
+	 * 매장 회원 정보 수정 페이지
 	 */
 	private void updateStoreInfoPage(){
 		scanner.nextLine();
@@ -280,22 +285,22 @@ public class DeliveryUI{
 		phone = phone.equals("") ? null : phone;
 		
 		// 업종 변경
-		int code = printStoreCodeForUpdate();
+		int code = inputStoreCodeForUpdate();
 		
 		// 지역 번호 수정
-		int area = printAreaForUpdate();
+		int area = inputAreaForUpdate();
 		
 		System.out.print("주문 최소 금액 : ");
 		String minOrderPriceStr = scanner.nextLine();
-		int minOrderPrice = minOrderPriceStr.equals("") ? 0 : Integer.parseInt(minOrderPriceStr);
+		int minOrderPrice = minOrderPriceStr.equals("") ? -1 : Integer.parseInt(minOrderPriceStr);
 		
 		System.out.print("배달 시간 : ");
 		String deliveryTimeStr = scanner.nextLine();
-		int deliveryTime = deliveryTimeStr.equals("") ? 0 : Integer.parseInt(deliveryTimeStr);
+		int deliveryTime = deliveryTimeStr.equals("") ? -1 : Integer.parseInt(deliveryTimeStr);
 		
 		System.out.print("배달팁 : ");
 		String deliveryTipStr = scanner.nextLine();
-		int deliveryTip = deliveryTipStr.equals("") ? 0 : Integer.parseInt(deliveryTipStr);
+		int deliveryTip = deliveryTipStr.equals("") ? -1 : Integer.parseInt(deliveryTipStr);
 		
 		
 		
@@ -322,7 +327,7 @@ public class DeliveryUI{
 		phone = phone.equals("") ? null : phone;
 		
 		// 지역 수정
-		int area = printAreaForUpdate();
+		int area = inputAreaForUpdate();
 		
 		System.out.print("주소 : ");
 		String address = scanner.nextLine();
@@ -381,7 +386,11 @@ public class DeliveryUI{
 		scanner.nextLine();
 		System.out.println("~~~~~~~~~~ [매장 검색 ] ~~~~~~~~~~");
 		System.out.print("검색 : ");
-		searchStore(scanner.nextLine());
+		String name = scanner.nextLine(); 
+		
+		// 검색된 매장 리스트 출력 & 매장 번호 입력
+		ArrayList<Store> lists = orderMgr.searchStore(name, custUserInfo.getArea_num());
+		printSearchedStoreList(lists);
 	}
 	
 
@@ -396,7 +405,7 @@ public class DeliveryUI{
 			System.out.println("~~~~~~~~~~ [ 카테고리 ] ~~~~~~~~~~");		
 			// 업종 코드 출력
 			System.out.println(" 전체 매장 검색은 0 을 입력 ");
-			codeNum = printStoreCode();
+			codeNum = inputStoreCode();
 			if (codeNum < 0 || codeNum > MAX_STORE_CODE_NUM) {
 				System.out.println("[SYSTEM] 잘못된 입력입니다");
 				continue;
@@ -417,18 +426,8 @@ public class DeliveryUI{
 		// 카테고리 조건 & 정렬방식이 적용된 select 결과
 		ArrayList<Store> lists = orderMgr.printStoreByCategory(custUserInfo.getArea_num(), codeNum, sort, minPrice);
 		
-		
-		if (lists.isEmpty()) {
-			System.out.println("[SYSTEM] 매장이 텅~");
-		} else {
-			for(Store list : lists) {
-				System.out.println(list);
-			}
-			System.out.println("[SYSTEM] 뒤로가기 시 0 을 입력해주세요");
-			System.out.print("> ");
-			int back = scanner.nextInt();
-			
-		}
+		// 검색된 매장 리스트 출력 & 매장 번호 입력
+		printSearchedStoreList(lists);
 	}
 	
 	
@@ -436,11 +435,11 @@ public class DeliveryUI{
 	 * 매장 정렬 방법 출력
 	 */
 	private int printStoreSortMethod() {
-		System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-		System.out.println("#### [ 정렬 방법 ] ####");
+		System.out.println("####### [ 정렬 방법 ] #######");
 		System.out.println("1. 기본순");
 		System.out.println("2. 배달빠른 순");
 		System.out.println("3. 배달팁 낮은 순");
+		System.out.println("-------------------------");
 		System.out.print("> ");
 		return scanner.nextInt();
 	}
@@ -450,15 +449,229 @@ public class DeliveryUI{
 	 * 최소 주문 금액 출력
 	 */
 	private int minOrderPriceList() {
-		System.out.println("#### [ 최소주문금액 ] ####");
-		System.out.println("0) 설정안함");
-		System.out.println("1) 5,000원 이하");
-		System.out.println("2) 10,000원 이하");
-		System.out.println("3) 12,000원 이하");
-		System.out.println("4) 15,000원 이하");
-		System.out.println("5) 20,000원 이하");
-		System.out.println("> ");
+		System.out.println("####### [ 최소주문금액 ] #######");
+		System.out.println("0. 설정안함");
+		System.out.println("1. 5,000원 이하");
+		System.out.println("2. 10,000원 이하");
+		System.out.println("3. 12,000원 이하");
+		System.out.println("4. 15,000원 이하");
+		System.out.println("5. 20,000원 이하");
+		System.out.println("----------------------------");
+		System.out.print("> ");
 		return scanner.nextInt();
+	}
+	
+	
+	/**
+	 * 검색된 매장 리스트 출력 및 매장 번호 입력
+	 */
+	private void printSearchedStoreList(ArrayList<Store> lists) {
+		boolean run = true;
+		while (run) {
+			// 검색된 매장 리스트 출력
+			boolean isEmpty = searchStore(lists);
+			
+			if (!isEmpty) {
+				System.out.println("[SYSTEM] 매장 번호를 입력해주세요");
+			}
+			System.out.println("[SYSTEM] 뒤로가기 시 0 을 입력해주세요");
+			System.out.print("> ");
+			int store_num = scanner.nextInt();
+			
+			// 뒤로가기
+    		if (store_num == 0) {
+    			run = false;
+    			break;
+    		}
+			
+			if (store_num != 0 && !isEmpty) {	// 입력값이 0이 아니고, 검색된 매장 리스트에 값이 있는 경우,
+				storeMenuPage(store_num);		// 선택한 매장의 메뉴 출력 페이지
+			}
+		}
+	}
+	
+	
+	/*
+	 * 선택한 매장의 메뉴 출력 페이지
+	 */
+	private void storeMenuPage(int store_num) {
+	    ArrayList<HashMap<String, Object>> mList = orderMgr.storeMenuPrintAll(store_num);
+	    
+	    if (mList.isEmpty()) {
+	      System.out.println("[SYSTEM] 메뉴를 추가중입니다!");
+	    } else {
+	    	// 매장 정보 출력
+	    	System.out.println("############ [ " + mList.get(STORE).get("STORE_NAME") +" ] ############");
+			System.out.println("전화번호 : " + mList.get(STORE).get("STORE_PHONE") 
+								+ "\n최소주문금액 : " + mList.get(STORE).get("MINORDERPRICE")
+								+ "\n배달시간 : " + mList.get(STORE).get("DELIVERYTIME")
+								+ "\n배달팁 : " + mList.get(STORE).get("DELIVERYTIP"));
+			System.out.println("============ [ 메뉴 목록 ] ============");
+			
+	    	// 매장 메뉴 리스트 출력
+			printMenuList(mList);
+			
+			// 번호 입력
+			boolean run = true;
+	    	while (run) {
+	    		System.out.println("[SYSTEM] 뒤로가기 : 0");
+	    		System.out.print("주문할 메뉴 번호를 입력해주세요 > ");
+	    		int menu_num = scanner.nextInt();
+	    		
+	    		// 뒤로가기
+	    		if (menu_num == 0) {
+	    			run = false;
+	    			break;
+	    		}
+	    		
+	    		// 선택한 매장에 있는 메뉴인지 확인
+	    		if (!orderMgr.checkMenuIsInTheSelectedStore(new Menu(menu_num, store_num))) {
+	    			System.out.println("[SYSTEM] 해당 매장에 없는 메뉴입니다");
+	    			continue;
+	    		}
+	    		
+	    		// 장바구니에 선택한 매장 메뉴 담기
+	    		insertShoppingBasket(menu_num);
+	    	}
+	    	
+
+	    	// 장바구니가 비어있으면
+	    	if (shoppingBasketLists.isEmpty()) {
+				return;
+			}
+	    	
+    		scanner.nextLine();
+    		System.out.print("장바구니 목록 확인 (Y / N) > ");
+    		String yn = scanner.nextLine();
+    		if (yn.toUpperCase().equals("Y") || yn.toUpperCase().equals("YES")) {
+    			confirmShoppingBasketPage(mList.get(STORE));	// 해당 매장의 정보를 전달
+    		}
+	    }
+	}
+
+	
+	/*
+	 * 장바구니에 메뉴 담기
+	 */
+	private void insertShoppingBasket(int menu_num) {    				
+		// 주문 갯수 입력
+    	System.out.print("수량 > ");
+    	int cnt = scanner.nextInt();
+    		
+    	// 장바구니에 저장
+    	boolean inBaskets = false; 
+    	
+    	// 주문하려는 메뉴가 이미 장바구니에 존재하는지 확인
+    	for(HashMap<String, Integer> list : shoppingBasketLists) {
+			if (list.get("menu_num") == menu_num) {							// 동일한 메뉴를 중복하여 주문하는 경우
+				list.replace("menu_count", list.get("menu_count") + cnt);	// 갯수만 추가
+				inBaskets = true;
+				break;
+			}
+		}
+    	
+    	// 장바구니에 없는 경우
+    	if (!inBaskets) {
+    		HashMap<String, Integer> map = new HashMap<>();
+    		map.put("menu_num", menu_num);
+        	map.put("menu_count", cnt);
+        	shoppingBasketLists.add(map);
+		}
+    }
+	
+	
+	/*
+	 * 장바구니 확인 페이지
+	 */
+	private void confirmShoppingBasketPage(HashMap<String, Object> store) {
+		System.out.println("============ [ 장바구니 ] ============");
+		
+		int total_price = 0;	// 총 금액
+		
+		// 저장된 음식 리스트 출력
+		for (int i = 0; i < shoppingBasketLists.size() ; i++) {
+			int menu_num = shoppingBasketLists.get(i).get("menu_num");		// 메뉴번호
+			int menu_count = shoppingBasketLists.get(i).get("menu_count");	// 메뉴 갯수
+		
+			Menu menu = orderMgr.printShoppingBasket(menu_num);
+			
+			int menu_total_price = (int) (menu.getMenu_price() * menu_count);	// 메뉴 별 갯수를 곱한 가격 
+			
+			System.out.println("아름 : " + menu.getMenu_name());
+			System.out.println("갯수 : " + menu_count);
+			System.out.println("가격 : " + menu_total_price);
+			System.out.println("--------------------------------");
+			
+			shoppingBasketLists.get(i).put("total_price", menu_total_price);	// hashmap에 메뉴 별 갯수를 곱한 가격  저장
+			
+			total_price += menu_total_price;
+		}
+		
+		System.out.println("총 주문 금액 : " + total_price);
+		System.out.println("--------------------------------");
+		
+		// 장바구니 관리
+		System.out.println("1. 장바구니 전체 삭제");
+		System.out.println("2. " + total_price + " 원 주문하기");
+		System.out.println("--------------------------------");
+		System.out.print("> ");
+		int key = scanner.nextInt();
+		
+		switch (key) {
+		case 1:	// 장바구니 전체 삭제
+			shoppingBasketLists.clear();
+			break;
+		case 2:	// 주문하기
+			int minOrderPrice = Integer.parseInt(String.valueOf(store.get("MINORDERPRICE")));
+			if (total_price < minOrderPrice) {
+				System.out.println("[SYSTEM] 배달 최소주문금액을 채워주세요");
+				System.out.println("배달 최소 주문 금액 : " + minOrderPrice + " 원");
+			} else {
+				orderShoppingBasketPage(total_price, store);	// 최종 결제 페이지
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	
+	
+	/*
+	 * 주문(결제) 페이지
+	 */
+	private void orderShoppingBasketPage(int total_price, HashMap<String, Object> store) {
+		scanner.nextLine();
+		System.out.println("============ [ 배달정보 ] ============");
+		System.out.println("배달 주소 	: " + custUserInfo.getCustomer_address());
+		System.out.println("번       호 	: " + custUserInfo.getCustomer_phone());
+		System.out.println("------------ [ 결제금액 ] -------------");
+		System.out.println("주문금액 : " + total_price);
+		System.out.println("배 달 팁  : " + store.get("DELIVERYTIP"));
+		System.out.println("-----------------------------------");
+		int orderTotalPrice = (total_price + Integer.parseInt(String.valueOf(store.get("DELIVERYTIP"))));
+		System.out.println("총 결제금액 : " + orderTotalPrice);
+		System.out.println("-----------------------------------");
+		System.out.println(orderTotalPrice + " 원 주문하기 (Y / N)");
+		System.out.print("> ");
+		String yn = scanner.nextLine();
+		
+		// 최종 주문 
+		if (yn.toUpperCase().equals("Y") || yn.toUpperCase().equals("YES")) {
+			for(HashMap<String, Integer> list : shoppingBasketLists) {
+				OrderedMenu ordered = new OrderedMenu(custUserInfo.getCustomer_num()
+													, Integer.parseInt(String.valueOf(store.get("STORE_NUM")))
+													, list.get("menu_num")
+													, list.get("menu_count")
+													, list.get("total_price")); 
+				orderMgr.orderMenu(ordered);
+			}
+		} else {
+			System.out.print("지금의 주문으로 다시 주문하시겠습니까 (Y / N) > ");
+			yn = scanner.nextLine();
+			if (yn.toUpperCase().equals("N") || yn.toUpperCase().equals("NO")) {
+				shoppingBasketLists.clear();	// 장바구니 초기화
+			}
+		}
 	}
 	
 	
@@ -467,11 +680,16 @@ public class DeliveryUI{
 	 */
 	private void controlMenuPage() {
 		boolean run = true;
-		while (run) {
-			System.out.println("~~~~~ [ MY 매장 메뉴 관리 ] ~~~~~");
+		while (run) {			
+			System.out.println("~~~~~~~ [ MY 매장 메뉴 관리 ] ~~~~~~~");
+			// 메뉴 리스트 출력
+			printMenuList(orderMgr.storeMenuPrintAll(storeUserInfo.getStore_num()));
+			
 			System.out.println("1. 메뉴 추가");
 			System.out.println("2. 메뉴 수정");
+			System.out.println("3. 메뉴 삭제");
 			System.out.println("0. 뒤로가기");
+			System.out.println("--------------------------------");
 			System.out.print("> ");
 			int menu = scanner.nextInt();
 			switch (menu) {
@@ -479,6 +697,10 @@ public class DeliveryUI{
 				addMenuPage();
 				break;
 			case 2:	// 메뉴 수정
+				updateMenuPage();
+				break;
+			case 3: // 메뉴 삭제
+				deleteMenuPage();
 				break;
 			case 0:	// 뒤로가기
 				run = false;
@@ -495,7 +717,7 @@ public class DeliveryUI{
 	 */
 	private void addMenuPage() {
 		scanner.nextLine();
-		System.out.println("~~~~~ [ 메뉴 추가 ] ~~~~~");
+		System.out.println("~~~~~ [ 메뉴 추가 페이지 ] ~~~~~");
 		
 		System.out.print("[필수] 메뉴 이름 : ");
 		String name = scanner.nextLine();
@@ -515,8 +737,73 @@ public class DeliveryUI{
 	}
 	
 	/*
-	 * 메뉴 수정
+	 * 메뉴 수정 페이지
 	 */
+	private void updateMenuPage() {
+		// 수정할 메뉴 번호 전달 후 수정 작업
+		System.out.print("메뉴 번호 입력 > ");
+		updateMenu(scanner.nextInt());
+	}
+	
+	
+	/*
+	 * 매장 수정 기능
+	 */
+	private void updateMenu(int num) {
+		scanner.nextLine();
+		System.out.println("~~~~~ [ 메뉴 수정 페이지 ] ~~~~~");
+		
+		System.out.print("메뉴 이름 : ");
+		String name = scanner.nextLine();
+		name = name.equals("") ? null : name;
+		
+		System.out.print("메뉴 소개 : ");
+		String intro = scanner.nextLine();
+		intro = intro.equals("") ? null : intro;
+		
+		System.out.print("메뉴 가격 : ");
+		String priceStr = scanner.nextLine();
+		int price = priceStr.equals("") ? -1 : Integer.parseInt(priceStr);
+		
+		System.out.print("품절 여부(Y / N) : ");
+		String soldoutStr = scanner.nextLine();
+		int soldout = 0;
+		
+		if (soldoutStr.equals("")) {
+			soldout = -1;	// 설정 유지
+		} else if (soldoutStr.toUpperCase().equals("Y") || soldoutStr.toUpperCase().equals("YES")) {
+			soldout = 1; 	// 품질
+		} else {
+			soldout = 0; 	// 판매중
+		}
+		
+		
+		if (orderMgr.updateMenu(new Menu(num, name, intro, price, soldout))) {
+			System.out.println("[SYSTEM] 메뉴 정보 변경 완료");
+		} else {
+			System.out.println("[SYSTEM] 에러 발생");
+		}
+	}
+	
+	
+	/*
+	 * 메뉴 삭제 페이지
+	 */
+	private void deleteMenuPage() {
+		System.out.print("메뉴 번호 입력 > ");
+		int menu_num = scanner.nextInt();
+		scanner.nextLine();
+		
+		System.out.print("메뉴를 삭제하겠습니까? (Y / N) > ");
+		String yesNo = scanner.nextLine();
+		if (yesNo.toUpperCase().equals("Y") || yesNo.toUpperCase().equals("YES")) {
+			if (orderMgr.deleteMenu(menu_num)) {
+				System.out.println("[SYSTEM] 메뉴를 삭제했습니다");
+			} else {
+				System.out.println("[SYSTEM] 오류 발생");
+			}
+		}
+	}
 	
 	/***************************************************************************************************************************
 	 * 
@@ -589,24 +876,36 @@ public class DeliveryUI{
 	
 	
 	/*
-	 * 지역 테이블 출력 (회원가입용)
+	 * 지역 테이블 출력
 	 */
-	private int printArea() {
+	private void printArea() {
+		int cnt = 0;
+		System.out.println("-------------------------------------------------------------------------------------------------");
 		for(Area area : accuntMgr.printArea()) {
-			System.out.println(area);
+			System.out.print(area + "\t|   ");
+			cnt++;
+			if (cnt == 3) {
+				cnt = 0;
+				System.out.println();
+			}
 		}
-		System.out.print("> ");
+		System.out.println("\n-------------------------------------------------------------------------------------------------");
+		System.out.print("지역 번호 > ");
+	}
+	
+	/*
+	 * 지역 테이블 입력 (회원가입용)
+	 */
+	private int inputArea() {
+		printArea();
 		return scanner.nextInt();
 	}
 	
 	/*
-	 * 지역 테이블 출력 (회원정보변경용)
+	 * 지역 테이블 입력 (회원정보변경용)
 	 */
-	private int printAreaForUpdate() {
-		for(Area area : accuntMgr.printArea()) {
-			System.out.println(area);
-		}
-		System.out.print("> ");
+	private int inputAreaForUpdate() {
+		printArea();
 		String areaNum = scanner.nextLine();
 		
 		if (areaNum.equals("")) {
@@ -618,24 +917,32 @@ public class DeliveryUI{
 
 	
 	/*
-	 * 업종 구분 코드 출력 (회원가입용)
+	 * 업종 구분 코드 출력
 	 */
-	private int printStoreCode() {
+	private void printStoreCode() {
+		System.out.println("-------------------------------------");
 		for(StoreCode code : accuntMgr.printStoreCode()) {
-			System.out.println(code);
+			System.out.println("| " + code);
 		}
-		System.out.print("> ");
+		System.out.println("-------------------------------------");
+		System.out.print("업종 코드 > ");
+	}
+	
+	
+	/*
+	 * 업종 구분 코드 입력 (회원가입용)
+	 */
+	private int inputStoreCode() {
+		printStoreCode();
 		return scanner.nextInt();
 	}
 	
+	
 	/*
-	 * 업종 구분 코드 출력 (회원정보변경용)
+	 * 업종 구분 코드 입력 (회원정보변경용)
 	 */
-	private int printStoreCodeForUpdate() {
-		for(StoreCode code : accuntMgr.printStoreCode()) {
-			System.out.println(code);
-		}
-		System.out.print("> ");
+	private int inputStoreCodeForUpdate() {
+		printStoreCode();
 		String codeNum = scanner.nextLine();
 		
 		if (codeNum.equals("")) {
@@ -733,10 +1040,10 @@ public class DeliveryUI{
 			Member member = inputIdPw(STORE);
 			
 			// 지역 입력
-			int areaNum = printArea();
+			int areaNum = inputArea();
 			
 			// 업종 종류 출력 & 입력
-			int codeNum = printStoreCode();
+			int codeNum = inputStoreCode();
 			scanner.nextLine();
 			
 			// 상세 정보 입력
@@ -794,7 +1101,7 @@ public class DeliveryUI{
 			String phone = scanner.nextLine();
 			
 			// 지역 입력
-			int areaNum = printArea();
+			int areaNum = inputArea();
 			scanner.nextLine();
 			
 			System.out.print("상세주소 : ");
@@ -827,15 +1134,34 @@ public class DeliveryUI{
 	/*
 	 * 매장 검색 기능 
 	 */
-	private void searchStore(String name) {
-		ArrayList<Store> lists = orderMgr.searchStore(name, custUserInfo.getArea_num());
-		
+	private boolean searchStore(ArrayList<Store> lists) {		
 		if (lists.isEmpty()) {
-			System.out.println("[SYSTEM] 매장이 텅~");
+			System.out.println("[SYSTEM] 텅~");
+			return true;
 		} else {
+			// 매장 리스트 출력
+			System.out.println("------------------------------------------------------------------------------");
 			for(Store list : lists) {
 				System.out.println(list);
+				System.out.println("------------------------------------------------------------------------------");
 			}
+			return false;
 		}
+	}
+	
+	
+	/*
+	 * 매장의 메뉴 리스트 출력
+	 */
+	private void printMenuList(ArrayList<HashMap<String, Object>> storeMenuList) {
+    	for (HashMap<String, Object> map : storeMenuList) {
+    		if(Integer.parseInt(String.valueOf(map.get("MENU_SOLDOUT"))) == 1) {
+    			continue;
+    		}
+    		System.out.println("매뉴번호 : " + map.get("MENU_NUM") + "\t매뉴이름 : " + map.get("MENU_NAME"));
+    		System.out.println("매뉴소개 : " + ((String) map.get("MENU_INTRO") == null ? "" : map.get("MENU_INTRO")));
+    		System.out.println("매뉴가격 : " + map.get("MENU_PRICE"));
+    		System.out.println("--------------------------------");
+    	}
 	}
 }

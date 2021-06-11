@@ -45,7 +45,7 @@ order by
 	<when test="sortType == 2"> deliverytime asc</when>
 	<!-- 3 : 배달팁 낮은 순 -->
 	<when test="sortType == 3"> deliverytip asc </when>
-	<otherwise>store_num desc</otherwise>
+	<otherwise>store_num asc</otherwise>
 </choose>
 </select>
 
@@ -68,6 +68,65 @@ and
 </select>
 
 
+<!-- 선택된 매장 메뉴 출력 기능 -->
+<select id="storeMenuPrintAll" resultType="hashmap" parameterType="int">
+select
+	s.store_num 		as store_num
+	,s.store_name 		as store_name
+	,s.store_phone 		as store_phone
+	,s.minorderprice 	as minorderprice
+	,s.deliverytime 	as deliverytime
+	,s.deliverytip 		as deliverytip
+	,m.menu_num 		as menu_num
+	,m.menu_name 		as menu_name
+	,m.menu_intro 		as menu_intro
+	,m.menu_price 		as menu_price
+	,m.menu_soldout 	as menu_soldout
+from
+	store s, menu m
+where
+	s.store_num = m.store_num
+and
+	m.store_num = #{store_num}
+order by
+	menu_num asc
+</select>
+
+
+<!-- 입력한 메뉴가 선택한 매장에 있는 메뉴인지 확인 -->
+<select id="checkMenuIsInTheSelectedStore" parameterType="menu" resultType="Integer">
+select
+	menu_num
+from
+	menu
+where
+	menu_num = #{menu_num}
+and
+	store_num = #{store_num}
+</select>
+
+
+<!-- 장바구니에 담긴 메뉴 리스트 출력 -->
+<select id="printShoppingBasket" resultType="menu" parameterType="int">
+select
+	menu_name
+	,menu_price
+from
+	menu
+where
+	menu_num = #{menu_num}
+</select>
+
+
+<!-- 장바구니에 담긴 메뉴 주문 기능 -->
+<insert id="orderMenu" parameterType="orderedMenu">
+insert into
+	ORDERED_MENU(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+	(ordered_menu_seq.nextval, #{customer_num}, #{store_num}, #{menu_num}, #{menu_count}, #{total_price})
+</insert>
+
+
 <!-- 메뉴 추가 기능 -->
 <insert id="addMenu" parameterType="menu">
 insert into
@@ -76,8 +135,28 @@ values
 	(menu_seq.nextval, #{store_num}, #{menu_name}, #{menu_intro, jdbcType=VARCHAR}, #{menu_price})
 </insert>
 
+
 <!-- 메뉴 수정 기능 -->
 <update id="updateMenu" parameterType="menu">
-
+update
+	menu
+<set>
+	menu_num = #{menu_num}
+	<if test="menu_name != null">,menu_name = #{menu_name}</if>
+	<if test="menu_intro != null">,menu_intro = #{menu_intro}</if>
+	<if test="menu_price != -1">,menu_price = #{menu_price}</if>
+	<if test="menu_soldout != -1">,menu_soldout = #{menu_soldout}</if>
+</set>
+where
+	menu_num = #{menu_num}
 </update>
+
+
+<!-- 메뉴 삭제 기능 -->
+<delete id="deleteMenu" parameterType="int">
+delete from
+	menu
+where
+	menu_num = #{menu_num}
+</delete>
 </mapper>

@@ -194,9 +194,9 @@ update
 	<if test="code_num != 0">,code_num = #{code_num}</if>
 	<if test="store_name != null">,store_name = #{store_name}</if>
 	<if test="store_phone != null">,store_phone = #{store_phone}</if>
-	<if test="minOrderPrice != 0">,minOrderPrice = #{minOrderPrice}</if>
-	<if test="deliveryTime != 0">,deliveryTime = #{deliveryTime}</if>
-	<if test="deliveryTip != 0">,deliveryTip = #{deliveryTip}</if>
+	<if test="minOrderPrice != -1">,minOrderPrice = #{minOrderPrice}</if>
+	<if test="deliveryTime != -1">,deliveryTime = #{deliveryTime}</if>
+	<if test="deliveryTip != -1">,deliveryTip = #{deliveryTip}</if>
 </set>
 where
 	store_num = #{store_num}
