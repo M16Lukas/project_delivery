@@ -175,5 +175,39 @@ public class OrderMenuDAO {
 		}
 		
 		return cnt;	
+	}
+	
+	
+	// 주문 내역 확인 기능 (매장회원용)
+	public ArrayList<HashMap<String, Object>> orderedMenuListForStore(int store_num){
+		SqlSession session = null;
+		ArrayList<HashMap<String, Object>> list = null;
+		try {
+			session = factory.openSession();
+			OrderMenuMapper mapper = session.getMapper(OrderMenuMapper.class);
+			list = mapper.orderedMenuListForStore(store_num);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null) session.close();
 		}
+		return list;
+	}
+		
+	
+	// 주문 내역 확인 기능 (개인회원용)
+	public ArrayList<HashMap<String, Object>> orderedMenuListForCustomer(int customer_num){
+		SqlSession session = null;
+		ArrayList<HashMap<String, Object>> list = null;
+		try {
+			session = factory.openSession();
+			OrderMenuMapper mapper = session.getMapper(OrderMenuMapper.class);
+			list = mapper.orderedMenuListForCustomer(customer_num);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null) session.close();
+		}
+		return list;
+	}
 }

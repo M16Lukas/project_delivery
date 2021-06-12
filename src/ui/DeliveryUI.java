@@ -1,6 +1,8 @@
 package ui;
 
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -20,7 +22,6 @@ public class DeliveryUI{
 	private final int STORE = 1;				// member_sort : 매장 회원 번호
 	private final int CUSTOMER = 2;				// member_sort : 개인 회원 번호
 	private final int MAX_STORE_CODE_NUM = 15;	// 업종 테이블 마지막 번호
-	private final int MAX_AREA_NUM = 17;		// 지역 테이블 마지막 번호
 	
 	// Object
 	private	Scanner scanner = new Scanner(System.in);
@@ -138,6 +139,7 @@ public class DeliveryUI{
 			int menu = scanner.nextInt();
 			switch (menu) {
 			case 1:	// 주문 이력 확인
+				orderedMenuListPage(STORE, storeUserInfo.getStore_num());
 				break;
 			case 2:	// 메뉴 관리
 				controlMenuPage();
@@ -176,6 +178,7 @@ public class DeliveryUI{
 				storeCategoryPage();
 				break;
 			case 3:	// 주문내역
+				orderedMenuListPage(CUSTOMER, custUserInfo.getCustomer_num());
 				break;
 			case 4:	// my정보
 				run = userInfoPage();
@@ -185,8 +188,8 @@ public class DeliveryUI{
 			}
 		}
 	}
-	
-	
+
+
 	/*
 	 * 로그인 계정 관리 페이지
 	 */
@@ -214,8 +217,7 @@ public class DeliveryUI{
 				returnB = false;
 				break;
 			case 3:	// 회원탈퇴
-				withdrawalPage();
-				run = false;
+				run = withdrawalPage();
 				break;
 			case 0:	// 뒤로가기
 				run = false;
@@ -342,33 +344,49 @@ public class DeliveryUI{
 	}
 	
 	
-
 	/*
 	 * 회원탈퇴 페이지
 	 */
-	private void withdrawalPage() {
+	private boolean withdrawalPage() {
 		scanner.nextLine();
-		System.out.println("************ 회원탈퇴 *************");
-		System.out.println("회원탈퇴를 원하시는 경우 비밀번호를 입력해 주세요");
-		System.out.print("> ");
-		String pw = scanner.nextLine();
+		System.out.println("***************** 회원탈퇴 ******************");
 		
-		if (loginUser.getMember_password().equals(pw)) {
-			System.out.println("-------------- [주의] -------------");
-			System.out.println("| 회원탈퇴 시 저장된 정보들이 전부 삭제됩니다     |");
-			System.out.println("| 탈퇴를 원하시면 Y를 입력해주세요  [Y / N] |");
-			System.out.println("----------------------------------");
+		boolean run = true;
+		while (run) {
+			System.out.println("회원탈퇴를 원하시는 경우 비밀번호를 입력해 주세요 (뒤로가기 : 0)");
 			System.out.print("> ");
-			String yesOrNo = scanner.nextLine();
+			String pw = scanner.nextLine();
 			
-			if (yesOrNo.toUpperCase().equals("Y") || yesOrNo.toUpperCase().equals("YES")) {
-				withdrawal();// 회원탈퇴 기능
-			} else {
-				System.out.println("[SYSTEM] 탈퇴를 취소합니다");
+			// 뒤로가기
+			if (pw.equals("0")) {
+				break;
 			}
-		} else {
-			System.out.println("[SYSTEM] 비밀번호가 일치하지 않습니다");
+			
+			// 로그인한 계정의 번호를 전달하여 비밀번호와 num return
+			Member tmp = accuntMgr.checkDuplicateAccount(loginUser.getMember_id());
+			
+			// return된 pw 와 입력된 password가 일치한지 확인
+			if (tmp.getMember_password().equals(pw) ) {
+				System.out.println("-------------- [주의] -------------");
+				System.out.println("| 회원탈퇴 시 저장된 정보들이 전부 삭제됩니다     |");
+				System.out.println("| 탈퇴를 원하시면 Y를 입력해주세요  [Y / N] |");
+				System.out.println("----------------------------------");
+				System.out.print("> ");
+				String yesOrNo = scanner.nextLine();
+				
+				if (yesOrNo.toUpperCase().equals("Y") || yesOrNo.toUpperCase().equals("YES")) {
+					withdrawal();	// 회원탈퇴 기능
+					return false;	// 무한루프 종료
+				} else {
+					System.out.println("[SYSTEM] 탈퇴를 취소합니다");
+					run = false;
+				}
+			} else {
+				System.out.println("[SYSTEM] 비밀번호가 일치하지 않습니다");
+			}
 		}
+		
+		return true;
 	} 
 
 	
@@ -483,9 +501,21 @@ public class DeliveryUI{
     			run = false;
     			break;
     		}
+    		
+    		// 입력한 매장 번호가 검색된 매장 리스트에 있는지 확인
+    		boolean in = false;
+    		for(Store store : lists) {
+    			// 입력한 매장 번호가 검색된 매장 리스트에 있는 경우
+    			if (store.getStore_num() == store_num) {
+					in = true;
+					break;
+				}
+    		}
 			
-			if (store_num != 0 && !isEmpty) {	// 입력값이 0이 아니고, 검색된 매장 리스트에 값이 있는 경우,
-				storeMenuPage(store_num);		// 선택한 매장의 메뉴 출력 페이지
+			if (store_num != 0 && !isEmpty && in) {	// 입력값이 0이 아니고, 검색된 매장 리스트에 값이 있고, 입력한 매장 번호가 검색된 매장 리스트에 있는 경우
+				storeMenuPage(store_num);			// 선택한 매장의 메뉴 출력 페이지
+			} else {
+				System.out.println("[SYSTEM] 매장번호를 확인해주세요");
 			}
 		}
 	}
@@ -514,7 +544,7 @@ public class DeliveryUI{
 			// 번호 입력
 			boolean run = true;
 	    	while (run) {
-	    		System.out.println("[SYSTEM] 뒤로가기 : 0");
+	    		System.out.println("[SYSTEM] 뒤로가기/그만담기 : 0");
 	    		System.out.print("주문할 메뉴 번호를 입력해주세요 > ");
 	    		int menu_num = scanner.nextInt();
 	    		
@@ -597,7 +627,7 @@ public class DeliveryUI{
 			
 			int menu_total_price = (int) (menu.getMenu_price() * menu_count);	// 메뉴 별 갯수를 곱한 가격 
 			
-			System.out.println("아름 : " + menu.getMenu_name());
+			System.out.println("이름 : " + menu.getMenu_name());
 			System.out.println("갯수 : " + menu_count);
 			System.out.println("가격 : " + menu_total_price);
 			System.out.println("--------------------------------");
@@ -805,12 +835,82 @@ public class DeliveryUI{
 		}
 	}
 	
+	
+	/**
+	 * 
+	 * 주문 내역 확인 페이지
+	 * 
+	 * @param member_sort - STORE : 매장, CUSTOMER : 개인
+	 * @param num		  - 매장 or 고객의 고유 번호 (store_num, customer_num)
+	 */
+	private void orderedMenuListPage(int member_sort, int num) {
+		switch (member_sort) {
+		case STORE:	// 매장회원의 주문 내역 확인
+			orderedMenuListPageForStore(num);
+			break;
+		case CUSTOMER:	// 고객 회원의 주문 내역 확인
+			orderedMenuListPageForCustomer(num);
+			break;
+		default:
+			break;
+		}
+	}
+
+	
+	/**
+	 * 주문 내역 확인 페이지 (매장회원 용)
+	 * 
+	 * @param num : store_num
+	 */
+	private void orderedMenuListPageForStore(int num) {
+		ArrayList<HashMap<String, Object>> lists = orderMgr.orderedMenuListForStore(num);
+		System.out.println("---------- [ 주문내역 ] ----------");
+		// 주문 내역 출력
+		printOrderedMenuListForStore(lists);
+		boolean run = true;
+		while (run) {
+			System.out.println("[SYSTEM] 뒤로가기 : 0");
+			System.out.print("> ");
+			int input = scanner.nextInt();
+			
+			if (input == 0) {
+				run = false;
+				break;
+			}
+		}
+	}
+	
+	
+	/*
+	 * 주문 내역 확인 페이지 (고객회원 용)
+	 * 
+	 * @param num : customer_num
+	 */
+	private void orderedMenuListPageForCustomer(int num) {
+		ArrayList<HashMap<String, Object>> lists = orderMgr.orderedMenuListForCustomer(num);
+		System.out.println("---------- [ 주문내역 ] ----------");
+		// 주문 내역 출력
+		printOrderedMenuListForCustomer(lists);
+		boolean run = true;
+		while (run) {
+			System.out.println("[SYSTEM] 뒤로가기  : 0");
+			System.out.print("> ");
+			int input = scanner.nextInt();
+			
+			if (input == 0) {
+				run = false;
+				break;
+			}
+		}
+	}
+
+
 	/***************************************************************************************************************************
 	 * 
 	 * Method Group
 	 * 
 	 **************************************************************************************************************************/
-	
+
 	/*********************************************************************************************************
 	 * 
 	 * 계정 관리 Method
@@ -1164,4 +1264,130 @@ public class DeliveryUI{
     		System.out.println("--------------------------------");
     	}
 	}
+	
+	
+	/*
+	 * 주문 내역 출력 (개인 회원 용)
+	 */
+	private void printOrderedMenuListForCustomer(ArrayList<HashMap<String, Object>> lists) {
+		if (lists.isEmpty()) {
+			System.out.println("[SYSTEM] 주문 내역이 없습니다");
+		} else {
+			// 주문 내역 비교용 hashmap
+			HashMap<String, Object> tmp = lists.get(0);
+			// 출력할 메뉴
+			String menuList = "\n" + String.valueOf(tmp.get("MENU_NAME")) + " " + String.valueOf(tmp.get("MENU_COUNT")) + " 개\t" + String.valueOf(tmp.get("TOTAL_PRICE")) + " 원";
+			// 총 주문금액
+			int totalPrice = Integer.parseInt(String.valueOf(tmp.get("TOTAL_PRICE")));
+			// 팁
+			int tip = Integer.parseInt(String.valueOf(tmp.get("DELIVERYTIP")));
+			
+			for (int i = 1; i < lists.size(); i++) {
+				// 동일한 시간대 주문(= 같은 매장) 일 경우
+				if (tmp.get("ORDERED_TIME").equals(lists.get(i).get("ORDERED_TIME"))) {
+					// 출력할 메뉴 정보 추가
+					menuList += "\n" + String.valueOf(lists.get(i).get("MENU_NAME")) + " " + String.valueOf(lists.get(i).get("MENU_COUNT")) + " 개\t" + String.valueOf(lists.get(i).get("TOTAL_PRICE")) + " 원";
+					// 총 주문금액 추가
+					totalPrice += Integer.parseInt(String.valueOf(lists.get(i).get("TOTAL_PRICE")));
+				} else {
+					// 주문 내역 출력
+					printOrderedForCustomer(tmp, menuList, totalPrice, tip);
+					
+					// 새로운 주문 내역 저장을 위한 초기화
+					tmp = lists.get(i);
+					// 출력할 메뉴
+					menuList = "\n" + String.valueOf(tmp.get("MENU_NAME")) + " " + String.valueOf(tmp.get("MENU_COUNT")) + " 개\t" + String.valueOf(tmp.get("TOTAL_PRICE")) + " 원";
+					// 총 주문금액
+					totalPrice = (Integer.parseInt(String.valueOf(tmp.get("MENU_COUNT"))) * Integer.parseInt(String.valueOf(tmp.get("TOTAL_PRICE"))));
+					// 팁
+					tip = Integer.parseInt(String.valueOf(tmp.get("DELIVERYTIP")));
+				}
+				
+				// 마지막 주문 내역일 경우 
+				if (i == lists.size() - 1) {
+					printOrderedForCustomer(tmp, menuList, totalPrice, tip);
+				}
+			}
+			
+		}
+	}
+	
+	
+	/*
+	 * 주문 내역 출력 (매장 회원 용)
+	 */
+	private void printOrderedMenuListForStore(ArrayList<HashMap<String, Object>> lists) {
+		if (lists.isEmpty()) {
+			System.out.println("[SYSTEM] 주문 내역이 없습니다");
+		} else {
+			// 주문 내역 비교용 hashmap
+			HashMap<String, Object> tmp = lists.get(0);
+			// 출력할 메뉴
+			String menuList = "\n" + String.valueOf(tmp.get("MENU_NAME")) + " " + String.valueOf(tmp.get("MENU_COUNT")) + " 개\t" + String.valueOf(tmp.get("TOTAL_PRICE")) + " 원";
+			// 총 주문금액
+			int totalPrice = Integer.parseInt(String.valueOf(tmp.get("TOTAL_PRICE")));
+			// 팁
+			int tip = storeUserInfo.getDeliveryTip();
+						
+			for (int i = 1; i < lists.size(); i++) {
+				// 동일한 시간에 고객이 주문한 경우
+				if (tmp.get("ORDERED_TIME").equals(lists.get(i).get("ORDERED_TIME")) && tmp.get("CUSTOMER_NUM").equals(lists.get(i).get("CUSTOMER_NUM"))) {
+					// 출력할 메뉴 정보 추가
+					menuList += "\n" + String.valueOf(lists.get(i).get("MENU_NAME")) + " " + String.valueOf(lists.get(i).get("MENU_COUNT")) + " 개\t" + String.valueOf(lists.get(i).get("TOTAL_PRICE")) + " 원";
+					// 총 주문금액 추가
+					totalPrice += Integer.parseInt(String.valueOf(lists.get(i).get("TOTAL_PRICE")));
+				} else {
+					// 주문 내역 출력
+					printOrderedForStore(tmp, menuList, totalPrice, tip);
+							
+					// 새로운 주문 내역 저장을 위한 초기화
+					tmp = lists.get(i);
+					// 출력할 메뉴
+					menuList = "\n" + String.valueOf(tmp.get("MENU_NAME")) + " " + String.valueOf(tmp.get("MENU_COUNT")) + " 개\t" + String.valueOf(tmp.get("TOTAL_PRICE")) + " 원";
+					// 총 주문금액
+					totalPrice = (Integer.parseInt(String.valueOf(tmp.get("MENU_COUNT"))) * Integer.parseInt(String.valueOf(tmp.get("TOTAL_PRICE"))));
+				}
+							
+				// 마지막 주문 내역일 경우 
+				if (i == lists.size() - 1) {
+					printOrderedForStore(tmp, menuList, totalPrice, tip);
+				}
+			}
+		}
+	}
+	
+	
+	/*
+	 * 주문 내역 출력 양식
+	 */
+	private void PrintOrderedMenu(String menuList, int totalPrice, int tip) {
+		System.out.println(menuList);
+		System.out.println("-------------------------------");
+		System.out.println("총주문금액 : " + totalPrice + " 원");
+		System.out.println("배   달   팁 : " + tip + " 원");
+		System.out.println("-------------------------------");
+		System.out.println("총결제금액 : " + (totalPrice + tip) + " 원");
+		System.out.println("===============================");
+	}
+	
+	/**
+	 * 주문 내역 출력문 (개인 회원 용)
+	 */
+	private void printOrderedForCustomer(HashMap<String, Object> tmp, String menuList, int totalPrice, int tip) {
+		System.out.println("주문일시 : " + tmp.get("ORDERED_TIME"));
+		System.out.println("매      장 : " + tmp.get("STORE_NAME"));
+		PrintOrderedMenu(menuList, totalPrice, tip);
+	}
+	
+	/**
+	 * 주문 내역 출력문 (매장 회원 용)
+	 */
+	private void printOrderedForStore(HashMap<String, Object> tmp, String menuList, int totalPrice, int tip) {
+		System.out.println("주문 일시  	 : " + tmp.get("ORDERED_TIME"));
+		System.out.println("고객명   	 : " + tmp.get("CUSTOMER_NAME"));
+		System.out.println("고객 전화번호 : " + tmp.get("CUSTOMER_PHONE"));
+		System.out.println("고객 주소 	 : " + tmp.get("CUSTOMER_ADDRESS"));
+		PrintOrderedMenu(menuList, totalPrice, tip);
+	}
 }
+

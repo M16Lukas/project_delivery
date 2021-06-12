@@ -38,4 +38,10 @@ public interface OrderMenuMapper {
 	
 	// 메뉴 삭제
 	public int deleteMenu(int menu_num);
+	
+	// 주문 내역 확인 기능 (매장회원용)
+	public ArrayList<HashMap<String, Object>> orderedMenuListForStore(int store_num);
+	
+	// 주문 내역 확인 기능 (개인회원용)
+	public ArrayList<HashMap<String, Object>> orderedMenuListForCustomer(int customer_num);
 }

@@ -87,7 +87,7 @@ create table ORDERED_MENU ( -- 주문 테이블
     ,menu_num       number(20)  references menu(menu_num)           -- 메뉴 번호
     ,menu_count     number(20)  default 1                           -- 메뉴 주문 개수
     ,ordered_time   date        default sysdate                     -- 주문날짜
-    ,total_price    number(38)  default 0                           -- 총 주문 금액
+    ,total_price    number(38)  default 0                           -- 메뉴 주문 금액
 );
 
 create sequence ordered_menu_seq;

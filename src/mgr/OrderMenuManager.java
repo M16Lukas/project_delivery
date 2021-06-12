@@ -87,4 +87,14 @@ public class OrderMenuManager {
 	public boolean deleteMenu(int menu_num) {
 		return dao.deleteMenu(menu_num) > 0 ? true : false;
 	}
+	
+	// 주문 내역 확인 기능 (매장회원용)
+	public ArrayList<HashMap<String, Object>> orderedMenuListForStore(int store_num){
+		return dao.orderedMenuListForStore(store_num);
+	}
+		
+	// 주문 내역 확인 기능 (개인회원용)
+	public ArrayList<HashMap<String, Object>> orderedMenuListForCustomer(int customer_num){
+		return dao.orderedMenuListForCustomer(customer_num);
+	}
 }

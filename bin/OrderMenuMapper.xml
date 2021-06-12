@@ -159,4 +159,51 @@ delete from
 where
 	menu_num = #{menu_num}
 </delete>
+
+
+<!-- 주문 내역 확인 기능 (매장회원용) -->
+<select id="orderedMenuListForStore" resultType="hashmap" parameterType="int">
+select
+	c.customer_num 								 	 as customer_num 	 <!-- 고객번호(비교용) -->
+	,c.customer_name 								 as customer_name 	 <!-- 고객명 -->
+	,c.customer_phone 								 as customer_phone   <!-- 고객 전화번호 -->
+	,c.customer_address 							 as customer_address <!-- 고객 주소 -->
+	,m.menu_name 									 as menu_name 		 <!-- 메뉴 이름 -->
+	,o.menu_count 									 as menu_count  	 <!-- 주문 수량 -->
+	,o.total_price 								 	 as total_price 	 <!-- 메뉴별 주문 가격 -->
+	,to_char(o.ordered_time, 'YYYY-MM-DD HH:MI:SS PM') as ordered_time 	 <!-- 주문시간 -->
+from
+	customer c, menu m, ordered_menu o
+where
+	o.customer_num = c.customer_num
+and
+	o.menu_num = m.menu_num
+and
+	o.store_num = #{store_num}
+order by
+	o.ordered_time desc, o.customer_num
+</select>
+
+
+<!-- 주문 내역 확인 기능 (개인회원용) -->
+<select id="orderedMenuListForCustomer" resultType="hashmap" parameterType="int">
+select
+	s.store_name 									 as store_name 	<!-- 매장명 -->
+	,s.deliverytip 									 as deliverytip <!-- 배달팁 -->
+	,m.menu_name 									 as menu_name 	<!-- 메뉴 이름 -->
+	,o.ordered_num 									 as ordered_num <!-- 주문번호 -->
+	,o.menu_count 									 as menu_count 	<!-- 주문 수량 -->
+	,o.total_price 									 as total_price <!-- 메뉴별 주문 가격 -->
+	,to_char(o.ordered_time, 'YYYY-MM-DD HH:MI:SS PM') as ordered_time <!-- 주문시간 -->
+from
+	store s, menu m, ordered_menu o
+where
+	o.store_num = s.store_num
+and
+	o.menu_num = m.menu_num
+and
+	o.customer_num = #{customer_num}
+order by
+	o.ordered_time desc, o.store_num
+</select>
 </mapper>
