@@ -15,7 +15,7 @@ drop table area;
 drop sequence area_seq;
 drop table member;
 drop sequence member_seq;
-COMMIT;
+commit;
 /*
 * create table
 */
@@ -87,7 +87,7 @@ create table ORDERED_MENU ( -- 주문 테이블
     ,menu_num       number(20)  references menu(menu_num)           -- 메뉴 번호
     ,menu_count     number(20)  default 1                           -- 메뉴 주문 개수
     ,ordered_time   date        default sysdate                     -- 주문날짜
-    ,total_price    number(38)  default 0                           -- 메뉴 주문 금액
+    ,total_price    number(38)  default 0                           -- 총 주문 금액
 );
 
 create sequence ordered_menu_seq;
@@ -145,55 +145,55 @@ values
 insert into 
     member(member_num, member_id, member_password, member_sort)
 values
-    (member_seq.nextval, 'scit1', 'scit1', 1);
+    (member_seq.nextval, 'scit11', 'scit11', 1);
 
 insert into 
     member(member_num, member_id, member_password, member_sort)
 values
-    (member_seq.nextval, 'scit2', 'scit2', 2);
+    (member_seq.nextval, 'scit12', 'scit12', 1);
 
 insert into 
     member(member_num, member_id, member_password, member_sort)
 values
-    (member_seq.nextval, 'scit3', 'scit3', 1);
+    (member_seq.nextval, 'scit13', 'scit13', 1);
 
 insert into 
     member(member_num, member_id, member_password, member_sort)
 values
-    (member_seq.nextval, 'scit4', 'scit4', 2);
+    (member_seq.nextval, 'scit14', 'scit14', 1);
 
 insert into 
     member(member_num, member_id, member_password, member_sort)
 values
-    (member_seq.nextval, 'scit5', 'scit5', 1);
+    (member_seq.nextval, 'scit15', 'scit15', 1);
     
 insert into 
     member(member_num, member_id, member_password, member_sort, member_withdrawal)
 values
-    (member_seq.nextval, 'scit6', 'scit6', 1, 1);
+    (member_seq.nextval, 'scit16', 'scit16', 1, 1);
 
 
 insert into 
     member(member_num, member_id, member_password, member_sort, member_withdrawal)
 values
-    (member_seq.nextval, 'scit7', 'scit7', 2, 1);
+    (member_seq.nextval, 'scit21', 'scit21', 2, 1);
 
 
 insert into 
     member(member_num, member_id, member_password, member_sort, member_withdrawal)
 values
-    (member_seq.nextval, 'scit8', 'scit8', 2, 2);
+    (member_seq.nextval, 'scit22', 'scit22', 2, 2);
 
 
 insert into 
     member(member_num, member_id, member_password, member_sort, member_withdrawal)
 values
-    (member_seq.nextval, 'scit9', 'scit9', 2, 1);
+    (member_seq.nextval, 'scit23', 'scit23', 2, 1);
     
 insert into 
     member(member_num, member_id, member_password, member_sort)
 values
-    (member_seq.nextval, 'scit9', 'scit9', 1);
+    (member_seq.nextval, 'scit24', 'scit24', 2);
 
 /*
 * 매장 테이블 (store)
@@ -210,7 +210,7 @@ insert into
          ,deliverytip
          )
 values
-    (store_seq.nextval, 7, 1, 2, 'IT한식', '02-1111-2222', 1000, 30, 1000);
+    (store_seq.nextval, 2, 1, 2, 'IT한식', '02-1111-2222', 1000, 30, 1000);
     
 insert into 
     store(store_num
@@ -224,7 +224,7 @@ insert into
          ,deliverytip
          )
 values
-    (store_seq.nextval, 8, 2, 1, '일본어돈까스', '031-1231-2782', 6000, 40, 3000);
+    (store_seq.nextval, 3, 1, 1, '일본어돈까스', '031-1231-2782', 6000, 40, 3000);
 
 insert into 
     store(store_num
@@ -238,7 +238,35 @@ insert into
          ,deliverytip
          )
 values
-    (store_seq.nextval, 10, 1, 8, '자바파스타', '02-5555-2323', 3000, 35, 2000);
+    (store_seq.nextval, 4, 1, 8, '자바파스타', '02-5555-2323', 3000, 35, 2000);
+    
+insert into 
+    store(store_num
+         ,member_num
+         ,area_num
+         ,code_num
+         ,store_name
+         ,store_phone
+         ,minorderprice
+         ,deliverytime
+         ,deliverytip
+         )
+values
+    (store_seq.nextval, 5, 2, 8, '엽떡 광명점', '031-5555-2323', 9000, 60, 2000);
+    
+insert into 
+    store(store_num
+         ,member_num
+         ,area_num
+         ,code_num
+         ,store_name
+         ,store_phone
+         ,minorderprice
+         ,deliverytime
+         ,deliverytip
+         )
+values
+    (store_seq.nextval, 6, 2, 1, '파이썬 혼밥', '031-5555-2323', 6000, 35, 1000);
 
 /*
 * 메뉴 테이블 (menu)
@@ -322,47 +350,191 @@ insert into
     menu(menu_num, store_num, menu_name, menu_intro, menu_price)
 values
     (MENU_SEQ.nextval, 3, '페퍼로니피자', '', 14900);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 4, 'A SET', '엽떡 OR 엽오 OR 반반 중 택 1 + 모듬튀김 (야채튀김1개+김말이1개+만두2개) + 계란 2알 OR 메추리알 5알 중 택 1', 17000);
 
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 4, 'B SET', '엽떡 OR 엽오 OR 반반 중 택 1 + 모듬튀김 (야채튀김1개+김말이1개+만두2개) + 계란 2알 OR 메추리알 5알 중 택 1 + 주먹김밥', 19000);
+
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 4, '엽기떡볶이/오뎅/반반', '맛있게 맵다. 동대문 엽기떡볶이!', 14000);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 4, '엽기닭볶음탕', '중독적인 매운맛에 진한 국물의 감칠맛!', 24000);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 4, '2인 엽기떡볶이', '둘이서도 즐길 수 있는 엽기떡볶이!', 9000);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 4, '엽기로제떡볶이/오뎅/반반', '부드러운 크림과 엽떡의 만남!', 16000);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '스팸 계란덮밥', '', 5000);
+
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '간장비빔국수', '', 5500);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '참치마요덮밥', '', 4500);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '길거리토스트', '', 2000);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '계란간장비빔밥', '', 3400);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '토마토 스파게티', '', 6700);
+    
+insert into
+    menu(menu_num, store_num, menu_name, menu_intro, menu_price)
+values
+    (MENU_SEQ.nextval, 5, '두부김치', '', 5600);
+    
 /*
 * 고객 테이블 (customer)
 */
 insert into 
     customer
 values
-    (CUSTOMER_SEQ.nextval, 3, '마리오', '010-1212-4343', 1, '서울특별시 강남구');
+    (CUSTOMER_SEQ.nextval, 7, '마리오', '010-1212-4343', 1, '서울특별시 강남구');
     
 insert into 
     customer
 values
-    (CUSTOMER_SEQ.nextval, 5, '쿠파', '010-7654-8888', 1, '서울특별시 동작구');
+    (CUSTOMER_SEQ.nextval, 8, '쿠파', '010-7654-8888', 1, '서울특별시 동작구');
     
 insert into 
     customer
 values
-    (CUSTOMER_SEQ.nextval, 8, '루이지', '010-2113-9908', 2, '경기도 파주시');
-
-insert into 
-    customer
-values
-    (CUSTOMER_SEQ.nextval, 9, '요시', '010-3433-9658', 2, '경기도 안산시');
+    (CUSTOMER_SEQ.nextval, 9, '루이지', '010-2113-9908', 2, '경기도 파주시');
 
 insert into 
     customer
 values
     (CUSTOMER_SEQ.nextval, 10, '크리보', '010-8745-0012', 2, '경기도 수원시');
+    
+insert into 
+    customer
+values
+    (CUSTOMER_SEQ.nextval, 11, '크리보', '010-8745-0012', 2, '경기도 수원시');
 
 /*
 * 주문 테이블(ordered_menu)
 */
 
 insert into
-    ordered_menu(ordered_num, customer_num, store_num, menu_num)
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
 values
-    (ORDERED_MENU_SEQ.nextval, 1, 1, 1);
+    (ORDERED_MENU_SEQ.nextval, 1, 1, 2, 2, 13000);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 1, 1, 3, 1, 6000);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 1, 1, 4, 4, 28000);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 2, 2, 7, 1, 6500);
 
 insert into
-    ordered_menu(ordered_num, customer_num, store_num, menu_num)
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
 values
-    (ORDERED_MENU_SEQ.nextval, 2, 2, 16);
+    (ORDERED_MENU_SEQ.nextval, 2, 2, 8, 1, 7000);
 
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 2, 2, 9, 1, 7500);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 2, 3, 12, 1, 5000);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 2, 3, 13, 1, 6000);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 1, 3, 15, 1, 8500);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 3, 4, 18, 1, 19000);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 3, 4, 19, 1, 14000);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 3, 4, 20, 1, 24000);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 4, 4, 18, 1, 19000);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 4, 4, 22, 1, 16000);
+
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 5, 4, 22, 1, 16000);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 5, 5, 23, 1, 5000);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 5, 5, 24, 1, 5500);
+    
+insert into
+    ordered_menu(ordered_num, customer_num, store_num, menu_num, menu_count, total_price)
+values
+    (ORDERED_MENU_SEQ.nextval, 5, 5, 25, 1, 4500);
 commit;
