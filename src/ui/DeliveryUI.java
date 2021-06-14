@@ -1047,6 +1047,7 @@ public class DeliveryUI{
 			}
 		}
 		
+		scanner.nextLine();
 		System.out.print("메뉴를 삭제하겠습니까? (Y / N) > ");
 		String yesNo = scanner.nextLine();
 		if (yesNo.toUpperCase().equals("Y") || yesNo.toUpperCase().equals("YES")) {
