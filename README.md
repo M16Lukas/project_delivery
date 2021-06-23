@@ -1,8 +1,18 @@
-# project_delivery
+# project_delivery(배달 플랫폼 프로그램)
+
+## [ 프로그램 개요 ]
+배달의 민족, 요기요와 같은 배달앱의 일부 기능들을 배운 지식을 활용하여 구현한다.
 
 ## [ 개발 환경 ]
 1. 개발언어   : JAVA 8
 2. DateBase  : Oracle 11g
 3. Framework : MyBatis 3.4.6
 
-## [ Mapper 설명 ]
+## [ Version ]
+
+### v1.5 (개발중)
+- html, css 사용하여 정적 페이지 생성
+
+### v1.0
+- DB 생성
+- Java 콘솔상에서 데이터 입출력 관리
